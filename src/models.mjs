@@ -135,7 +135,7 @@ export function seatLabel(key) {
   return SEAT_BY_KEY[key]?.label ?? key;
 }
 
-function mulberry32(a) {
+export function mulberry32(a) {
   return function () {
     a |= 0; a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);

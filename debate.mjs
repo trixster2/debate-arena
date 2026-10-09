@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -39,8 +38,8 @@ function usage() {
   --rounds N          自由辩论回合数（每回合双方各发言一次），默认 3
   --qa N              每组盘问的问答轮数，默认 2
   --shuffle           随机分配席位（默认按人设契合度自动分配）
-  --seed N            随机/打散种子，同种子结果可复现
-  --assign k=v,...    手动指定席位模型，如 pro1=glm-5.3,judge=kimi-k2.6
+  --seed N            随机/打散种子；同种子下掷币结果与分配可复现
+  --assign k=v,...    手动指定席位模型，如 pro1=kimi-k2.6,judge=qwen3.8-27b
   --out DIR           输出目录，默认 runs/<时间戳>/
   --dry               只做席位分配并打印，不调用网关
 
@@ -103,6 +102,7 @@ try {
     assign,
     freeRounds: args.freeRounds,
     qaRounds: args.qaRounds,
+    seed: args.seed,
     onEvent: (ev) => { if (ev.type === 'speech') collected.push(ev.entry); },
   });
 } catch (e) {
@@ -122,3 +122,4 @@ console.log(`完赛，用时 ${((Date.now() - t0) / 60000).toFixed(1)} 分钟。
 console.log(`  ${join(outDir, 'transcript.md')}`);
 console.log(`  ${join(outDir, 'debate.json')}`);
 console.log(`结果：${result.winnerLabel}胜（${result.scores.pro_total} : ${result.scores.con_total}）`);
+console.log(`掷币：${result.firstTeam === 'pro' ? '正方' : '反方'}先手并压轴结辩${args.seed ? `（seed=${args.seed}，可复现）` : ''}`);

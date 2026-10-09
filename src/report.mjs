@@ -16,6 +16,7 @@ export function toMarkdown(result) {
   lines.push('');
   lines.push(`- 正方立场：${result.proStance}`);
   lines.push(`- 反方立场：${result.conStance}`);
+  if (result.firstTeam) lines.push(`- 掷硬币：${SIDE_NAME[result.firstTeam]}先手（开篇立论在先），并由其四辩压轴结辩`);
   lines.push(`- 时间：${new Date().toLocaleString('zh-CN')}`);
   lines.push('');
   lines.push('## 席位分配');

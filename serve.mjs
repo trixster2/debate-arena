@@ -46,17 +46,18 @@ function startRun(body) {
     scores: null,
     winner: null,
     winnerLabel: null,
+    firstTeam: null,
     error: null,
   };
   live.set(id, state);
 
   runDebate({
-    topic, proStance, conStance, assign, freeRounds, qaRounds,
+    topic, proStance, conStance, assign, freeRounds, qaRounds, seed,
     log: () => {},
     onEvent: (ev) => {
       if (ev.type === 'pending') { state.pending = { ...ev, startedAt: Date.now() }; state.progress.idx = ev.idx; }
       else if (ev.type === 'speech') { state.transcript.push(ev.entry); state.pending = null; }
-      else if (ev.type === 'score') { state.scores = ev.scores; state.winner = ev.winner; state.winnerLabel = ev.winnerLabel; }
+      else if (ev.type === 'score') { state.scores = ev.scores; state.winner = ev.winner; state.winnerLabel = ev.winnerLabel; state.firstTeam = ev.firstTeam; }
     },
   }).then((result) => {
     const dir = join(RUNS, id);
@@ -75,7 +76,7 @@ function startRun(body) {
       mkdirSync(dir, { recursive: true });
       writeFileSync(join(dir, 'debate.json'), JSON.stringify({
         topic, proStance, conStance, assign, transcript: state.transcript,
-        scores: state.scores, winner: state.winner, winnerLabel: state.winnerLabel,
+        scores: state.scores, winner: state.winner, winnerLabel: state.winnerLabel, firstTeam: state.firstTeam,
         error: state.error, totalElapsedMs: Date.now() - state.meta.startedAt,
       }, null, 2));
       if (state.scores) writeFileSync(join(dir, 'transcript.md'), toMarkdown({
@@ -123,7 +124,7 @@ function getRun(id) {
     meta: { topic: d.topic, proStance: d.proStance, conStance: d.conStance, assign: d.assign, freeRounds: null, qaRounds: null, startedAt: null },
     pending: null,
     transcript: d.transcript || [],
-    scores: d.scores, winner: d.winner, winnerLabel: d.winnerLabel,
+    scores: d.scores, winner: d.winner, winnerLabel: d.winnerLabel, firstTeam: d.firstTeam,
     error: null, totalElapsedMs: d.totalElapsedMs,
   };
 }
