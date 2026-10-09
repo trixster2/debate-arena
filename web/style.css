@@ -1,0 +1,226 @@
+:root {
+  --paper: #f5efe3;
+  --card: #fbf7ec;
+  --ink: #262117;
+  --soft: #8b8171;
+  --faint: #b5ab97;
+  --line: #ddd3bd;
+  --amber: #bc651f;
+  --amber-wash: #f2ddc0;
+  --serif: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
+  --mono: "Cascadia Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:
+    radial-gradient(1200px 500px at 50% -120px, rgba(188, 101, 31, 0.07), transparent 60%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+main { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; position: relative; }
+
+/* ── 报头 ─────────────────────────────── */
+.masthead { text-align: center; padding: 44px 24px 20px; }
+.masthead h1 {
+  font-size: clamp(34px, 6vw, 54px);
+  letter-spacing: 0.35em; text-indent: 0.35em;
+  font-weight: 700; margin: 10px 0 6px;
+}
+.mast-sub { color: var(--soft); font-size: 14px; letter-spacing: 0.12em; }
+.mast-rule { color: var(--faint); font-size: 12px; letter-spacing: 0.2em; }
+.masthead nav { margin-top: 14px; font-size: 15px; }
+.masthead nav a { color: var(--ink); text-decoration: none; padding: 2px 6px; border-bottom: 1px solid var(--line); }
+.masthead nav a:hover { color: var(--amber); border-color: var(--amber); }
+.nav-dot { color: var(--faint); margin: 0 8px; }
+
+/* ── 通用标题 ─────────────────────────── */
+.sec-title {
+  font-size: 15px; letter-spacing: 0.4em; text-indent: 0.4em;
+  color: var(--soft); text-align: center; margin-bottom: 22px;
+  position: relative;
+}
+.sec-title::before, .sec-title::after {
+  content: ""; display: block; border-top: 1px solid var(--line); margin: 0 auto 8px; width: 60%;
+}
+.sec-title::after { margin: 8px auto 0; }
+
+/* ── 设赛 ─────────────────────────────── */
+.setup-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 48px -32px rgba(38, 33, 23, 0.35);
+  max-width: 720px; margin: 24px auto 48px;
+  padding: 40px 44px 30px;
+}
+.field { display: block; margin-bottom: 18px; }
+.field > span {
+  display: block; font-size: 13px; letter-spacing: 0.25em;
+  color: var(--soft); margin-bottom: 6px;
+}
+.field .hint { color: var(--faint); letter-spacing: 0.1em; margin-left: 8px; font-size: 12px; }
+.field input, .field select {
+  width: 100%; font-family: var(--serif); font-size: 17px; color: var(--ink);
+  background: transparent; border: 0; border-bottom: 1.5px solid var(--line);
+  padding: 6px 2px; outline: none; border-radius: 0;
+}
+#f-topic { font-size: 24px; font-weight: 700; }
+.field input:focus, .field select:focus { border-color: var(--amber); }
+.field input::placeholder { color: var(--faint); font-weight: 400; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+select { appearance: none; -webkit-appearance: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%238b8171'/%3E%3C/svg%3E") no-repeat right 4px center; cursor: pointer; }
+
+.cta {
+  display: block; width: 100%; margin-top: 26px;
+  font-family: var(--serif); font-size: 20px; letter-spacing: 0.5em; text-indent: 0.5em;
+  background: var(--ink); color: var(--card);
+  border: 0; padding: 15px 0; cursor: pointer;
+  transition: background 0.25s, transform 0.15s;
+}
+.cta:hover { background: var(--amber); }
+.cta:active { transform: translateY(1px); }
+.cta:disabled { background: var(--faint); cursor: wait; }
+.form-error { color: #a33b2a; font-size: 14px; margin-top: 12px; text-align: center; }
+.setup-note { color: var(--soft); font-size: 12.5px; text-align: center; margin-top: 16px; letter-spacing: 0.05em; }
+
+/* ── 历史对局 ─────────────────────────── */
+.archive { max-width: 720px; margin: 0 auto; }
+.archive-list { display: grid; gap: 12px; }
+.arc-item {
+  display: flex; align-items: baseline; gap: 16px;
+  background: var(--card); border: 1px solid var(--line);
+  padding: 14px 20px; cursor: pointer; text-decoration: none; color: var(--ink);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.arc-item:hover { border-color: var(--amber); transform: translateX(4px); }
+.arc-date { font-family: var(--mono); font-size: 12px; color: var(--soft); white-space: nowrap; }
+.arc-topic { flex: 1; font-weight: 700; }
+.arc-score { font-family: var(--mono); font-size: 13px; color: var(--amber); white-space: nowrap; }
+.arc-badge { font-size: 12px; color: var(--soft); border: 1px solid var(--line); padding: 1px 8px; white-space: nowrap; }
+.arc-badge.live { color: var(--amber); border-color: var(--amber); }
+.archive-empty { color: var(--soft); text-align: center; font-size: 14px; }
+
+/* ── 赛场 ─────────────────────────────── */
+.arena-head { text-align: center; padding: 8px 0 4px; }
+.arena-topic { font-size: clamp(24px, 4vw, 36px); letter-spacing: 0.12em; margin-bottom: 8px; }
+.arena-stances { font-size: 15px; color: var(--soft); }
+.arena-stances b { color: var(--ink); font-weight: 700; }
+.arena-stances .sp { margin: 0 14px; color: var(--faint); }
+.arena-progress { margin-top: 12px; font-family: var(--mono); font-size: 12px; color: var(--soft); }
+.stage-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 16px 0 30px; }
+.chip {
+  font-size: 12.5px; letter-spacing: 0.15em; color: var(--faint);
+  border: 1px solid var(--line); padding: 3px 12px; background: transparent;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.chip.on { color: var(--amber); border-color: var(--amber); background: var(--amber-wash); }
+.chip.past { color: var(--soft); border-color: var(--soft); }
+
+.arena-grid { display: grid; grid-template-columns: 236px 1fr; gap: 28px; align-items: start; }
+
+.seatboard {
+  position: sticky; top: 20px;
+  background: var(--card); border: 1px solid var(--line); padding: 18px 16px;
+}
+.seatboard h3 { font-size: 13px; letter-spacing: 0.35em; color: var(--soft); text-align: center; margin-bottom: 14px; }
+.seat { padding: 7px 10px; margin-bottom: 6px; border-left: 3px solid transparent; transition: background 0.25s, border-color 0.25s; }
+.seat .s-label { font-size: 12px; color: var(--soft); letter-spacing: 0.2em; }
+.seat .s-alias { font-weight: 700; font-size: 16px; }
+.seat .s-model { font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
+.seat.pro { border-left-color: var(--amber); }
+.seat.con { border-left-color: var(--soft); border-left-style: dashed; }
+.seat.neutral { border-left-color: transparent; opacity: 0.85; }
+.seat.speaking { background: var(--amber-wash); animation: seatpulse 1.6s ease-in-out infinite; }
+@keyframes seatpulse { 50% { background: #edd0a4; } }
+.legend { text-align: center; font-size: 11.5px; color: var(--soft); margin-top: 10px; }
+.mark-pro, .mark-con { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }
+.mark-pro { background: var(--amber); }
+.mark-con { border: 1.5px dashed var(--soft); }
+
+/* ── 实录流 ───────────────────────────── */
+.feed { min-height: 200px; }
+.stage-block { margin-bottom: 34px; }
+.stage-name {
+  font-size: 14px; letter-spacing: 0.35em; color: var(--ink);
+  text-align: center; margin-bottom: 18px; position: relative;
+}
+.stage-name::before, .stage-name::after {
+  content: ""; display: block; border-top: 1px solid var(--line); width: 42%; margin: 0 auto;
+}
+.stage-name::before { margin-bottom: 10px; }
+.stage-name::after { margin-top: 10px; }
+
+.speech {
+  background: var(--card); border: 1px solid var(--line);
+  border-left: 3px solid var(--soft);
+  padding: 16px 22px 12px; margin: 0 0 14px auto; max-width: 92%;
+  animation: rise 0.5s ease both;
+}
+.speech.pro { border-left: 3px solid var(--amber); margin-left: auto; margin-right: 0; }
+.speech.con { border-left: 3px dashed var(--soft); margin-left: 0; margin-right: auto; }
+.speech.neutral { max-width: 100%; border-left: 0; border-top: 3px double var(--line); }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+.sp-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.sp-seat { font-weight: 700; font-size: 15px; letter-spacing: 0.1em; }
+.sp-alias { color: var(--amber); font-weight: 700; }
+.sp-model { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+.sp-body { font-size: 15.5px; text-align: justify; }
+.sp-meta { font-family: var(--mono); font-size: 11px; color: var(--faint); text-align: right; margin-top: 6px; }
+
+.pending {
+  border: 1px dashed var(--amber); background: rgba(242, 221, 192, 0.35);
+  padding: 14px 20px; margin-bottom: 14px; max-width: 92%;
+  color: var(--amber); letter-spacing: 0.08em; font-size: 14.5px;
+}
+.pending .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); margin-right: 8px; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0.15; } }
+
+/* ── 判决 ─────────────────────────────── */
+.verdict {
+  margin: 46px auto 0; max-width: 760px;
+  background: var(--card); border: 1px solid var(--line);
+  border-top: 3px double var(--ink); padding: 34px 40px 30px;
+  animation: rise 0.6s ease both;
+}
+.verdict h3 { text-align: center; font-size: 15px; letter-spacing: 0.4em; color: var(--soft); margin-bottom: 20px; }
+.win-line { text-align: center; margin-bottom: 22px; }
+.win-side { font-size: 34px; font-weight: 700; letter-spacing: 0.2em; }
+.win-score { font-family: var(--mono); font-size: 22px; color: var(--amber); margin-top: 4px; }
+.win-best { font-size: 14px; color: var(--soft); margin-top: 8px; }
+.win-best b { color: var(--amber); }
+table.score-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 14px; }
+.score-table th, .score-table td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: center; }
+.score-table th { color: var(--soft); font-weight: 400; font-size: 12.5px; letter-spacing: 0.1em; }
+.score-table td:first-child, .score-table th:first-child { text-align: left; font-weight: 700; }
+.score-table .total { color: var(--amber); font-weight: 700; font-family: var(--mono); }
+.score-notes { font-size: 13.5px; color: var(--soft); text-align: center; }
+
+.run-error { border: 1px solid #a33b2a; color: #a33b2a; padding: 18px 24px; text-align: center; margin-top: 20px; }
+.done-flag { text-align: center; color: var(--soft); font-size: 13px; letter-spacing: 0.3em; margin-top: 30px; }
+
+.foot { text-align: center; color: var(--faint); font-size: 11.5px; letter-spacing: 0.2em; padding: 30px 0 40px; }
+
+@media (max-width: 860px) {
+  .arena-grid { grid-template-columns: 1fr; }
+  .seatboard { position: static; }
+  #seat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .field-row, .field-row.three { grid-template-columns: 1fr; }
+  .setup-card { padding: 28px 22px 22px; }
+}

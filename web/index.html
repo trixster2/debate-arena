@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模型辩论擂台</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-rule">◆ ————— ◆ ————— ◆</div>
+  <h1>模型辩论擂台</h1>
+  <p class="mast-sub">给一个辩题 · 网关里的模型各领一个马甲，按国辩流程自己吵完</p>
+  <div class="mast-rule">◆ ————— ◆ ————— ◆</div>
+  <nav><a href="#/" data-nav="home">设赛</a><span class="nav-dot">·</span><a href="#/" data-nav="archive">历史对局</a></nav>
+</header>
+
+<main>
+
+  <!-- 设赛 -->
+  <section id="view-setup" class="view">
+    <div class="setup-card">
+      <h2 class="sec-title">本场设置</h2>
+      <label class="field">
+        <span>辩题</span>
+        <input id="f-topic" type="text" placeholder="例：技术让人变得更勤快还是更懒惰" autocomplete="off">
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>正方立场<span class="hint">可不填</span></span>
+          <input id="f-pro" type="text" placeholder="例：技术让人更懒惰">
+        </label>
+        <label class="field">
+          <span>反方立场<span class="hint">可不填</span></span>
+          <input id="f-con" type="text" placeholder="例：技术让人更勤快">
+        </label>
+      </div>
+      <div class="field-row three">
+        <label class="field">
+          <span>自由辩论回合</span>
+          <select id="f-rounds"><option value="2">2 回合</option><option value="3" selected>3 回合</option><option value="4">4 回合</option><option value="6">6 回合</option></select>
+        </label>
+        <label class="field">
+          <span>每组盘问轮数</span>
+          <select id="f-qa"><option value="1">1 轮</option><option value="2" selected>2 轮</option><option value="3">3 轮</option></select>
+        </label>
+        <label class="field">
+          <span>席位分配</span>
+          <select id="f-assign"><option value="auto">按人设契合度</option><option value="shuffle">随机发牌</option></select>
+        </label>
+      </div>
+      <button id="btn-start" class="cta">开 赛</button>
+      <p id="setup-error" class="form-error" hidden></p>
+      <p class="setup-note">一场约二十余次模型调用，十几分钟到半小时。产物同时写入 runs/ 目录，可离线分享。</p>
+    </div>
+
+    <div class="archive">
+      <h2 class="sec-title">历史对局</h2>
+      <div id="archive-list" class="archive-list"></div>
+    </div>
+  </section>
+
+  <!-- 赛场 -->
+  <section id="view-arena" class="view" hidden>
+    <div class="arena-head">
+      <h2 id="a-topic" class="arena-topic"></h2>
+      <div id="a-stances" class="arena-stances"></div>
+      <div id="a-progress" class="arena-progress"></div>
+      <div id="a-chips" class="stage-chips"></div>
+    </div>
+
+    <div class="arena-grid">
+      <aside class="seatboard">
+        <h3>席位板</h3>
+        <div id="seat-cards"></div>
+        <div class="legend"><span class="mark-pro"></span> 正方 &nbsp;<span class="mark-con"></span> 反方</div>
+      </aside>
+      <div class="feed" id="feed"></div>
+    </div>
+
+    <div id="verdict" class="verdict" hidden></div>
+  </section>
+
+</main>
+
+<footer class="foot">模型辩论擂台 · 比分由模型给出，仅供娱乐</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

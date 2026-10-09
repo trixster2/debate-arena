@@ -1,0 +1,10 @@
+{
+  "name": "debate-arena",
+  "version": "0.1.0",
+  "description": "模型辩论擂台：给一个辩题，让十个不同的大模型按国际大专辩论赛规则自己吵完",
+  "type": "module",
+  "bin": { "debate-arena": "./debate.mjs" },
+  "scripts": { "start": "node serve.mjs", "debate": "node debate.mjs" },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
