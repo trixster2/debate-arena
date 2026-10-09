@@ -18,8 +18,12 @@ cp .env.example .env    # 填入你的 LLMGW_API_KEY（OpenAI 兼容网关的密
 ## Web 观赛室
 
 ```bash
+# Windows：双击 start.bat        macOS / Linux：sh start.sh
+# 或者手动：
 node serve.mjs        # 启动后打开 http://localhost:5180
 ```
+
+启动脚本是幂等的：端口已被占用就直接开页面，不会重复起服务。
 
 在页面里填辩题、选双方持方与回合数，点「开赛」即可**直播整场辩论**：
 席位板实时高亮当前发言的模型，实录逐条流入，裁判亮分后自动弹出评分卡；
@@ -84,7 +88,11 @@ node debate.mjs "辩题" [选项]
 
 ## 换自己的模型池
 
-改 `src/models.mjs` 里的 `MODELS` 数组即可（`id` 换成你网关里真实存在的模型名，人设随便编）。
+**默认网关**：项目开箱对接**书生 Discovery 的 OpenAI 兼容端点** `https://discovery-api.intern-ai.org.cn/v1`——
+`src/models.mjs` 里的八套马甲人设（锋刃、疾风、说书人…）就是这个网关提供的模型。
+在书生开放平台申请自己的 API key，填进 `.env` 的 `LLMGW_API_KEY` 即可开赛；本仓库不含任何密钥。
+
+改 `src/models.mjs` 里的 `MODELS` 数组即可增删角色（`id` 换成你网关里真实存在的模型名，人设随便编）。
 客户端是标准 OpenAI 兼容协议，把 `.env` 里的 `LLMGW_BASE_URL` 指向任何兼容网关（vLLM、各家云 API）都能跑。
 
 ## 实现手记（踩过的坑）
