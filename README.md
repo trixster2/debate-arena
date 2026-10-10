@@ -5,7 +5,7 @@
 每个模型领一个马甲和人设，按国际大专辩论赛（新国辩）流程打完全场：
 一辩立论、三辩盘问、二辩驳论、自由辩论、四辩结辩，裁判长按 内容/语言/配合 三项打分并评出最佳辩手，主席宣读结果。
 
-零依赖，只要 Node.js ≥ 18 和一个 OpenAI 兼容网关。提供两种玩法：**浏览器观赛室**（推荐）与命令行。
+零依赖，只要 Node.js ≥ 18 和一个 OpenAI 兼容网关。提供三种玩法：**单文件版（双击即用）**、**浏览器观赛室**与命令行。
 
 ## 安装
 
@@ -14,6 +14,15 @@ git clone https://github.com/trixster2/debate-arena.git
 cd debate-arena
 cp .env.example .env    # 填入你的 LLMGW_API_KEY（OpenAI 兼容网关的密钥）
 ```
+
+## 单文件版 standalone.html
+
+双击 `standalone.html` 就能玩——整场编排、席位分配、观赛界面全在**一个 HTML 文件**里，纯浏览器直连网关（`file://` 打开即可，无需任何服务；Windows / macOS 通用）。
+
+- 首次使用点「密钥设置」填入 API key，只存在该浏览器 localStorage，不写入文件、不上传任何地方；文件内不含任何密钥
+- 「演示模式」：免密钥空跑全流程，先看赛制和界面再认真开打
+- 出场顺序同样采用掷硬币制，历史对局存本机（最近 12 局），实录可导出 Markdown / JSON
+- 私发给朋友即"打开即用"——但密钥别写进文件（拿到文件=拿到 key）
 
 ## Web 观赛室
 
@@ -36,7 +45,7 @@ node debate.mjs "技术让人变得更勤快还是更懒惰" --pro "技术让人
 ```
 
 一场完整辩论约 26 次模型调用，耗时十几分钟到半小时不等，取决于网关速度与思考开关。
-两种玩法的产物一致，都写入 `runs/<时间戳>/`：
+产物写入 `runs/<时间戳>/`：
 
 - `transcript.md` —— 全场实录 + 席位表 + 评分表，可直接分享
 - `debate.json` —— 结构化数据（每条发言带模型、耗时、token 用量），方便二次统计
@@ -96,7 +105,8 @@ node debate.mjs "辩题" [选项]
 在书生开放平台申请自己的 API key，填进 `.env` 的 `LLMGW_API_KEY` 即可开赛；本仓库不含任何密钥。
 
 改 `src/models.mjs` 里的 `MODELS` 数组即可增删角色（`id` 换成你网关里真实存在的模型名，人设随便编）。
-客户端是标准 OpenAI 兼容协议，把 `.env` 里的 `LLMGW_BASE_URL` 指向任何兼容网关（vLLM、各家云 API）都能跑。
+客户端是标准 OpenAI 兼容协议，把 `.env` 里的 `LLMGW_BASE_URL` 指向任何兼容网关（vLLM、各家云 API）都能跑；
+单文件版如要换网关，改 `standalone.html` 里的 `BASE` 常量。
 
 ## 实现手记（踩过的坑）
 
@@ -104,6 +114,7 @@ node debate.mjs "辩题" [选项]
 - 全场默认**关闭思考**（`thinking: {"type":"disabled"}` + `reasoning_effort: low`）：实测立论从数分钟级降到 4~15 秒。想恢复某环节的思考质量，给对应 `call()` 传 `chatOpts: { thinking: true, maxTokens: 16000 }` 即可。
 - 裁判评分走 `response_format: json_object`，解析失败自动重试一次；提示词明令"勿因出场顺序偏挞"。真平分才判给压轴方，而压轴方由掷币决定，概率对等。
 - glm-5.3 与 intern-s2 先后被移出默认阵容：前者思考开销大，后者出词慢（关思考后一次立论实测 149 秒，一局两出手占全程 48%）。在 `src/models.mjs` 里增删模型即可，席位分配会自动适应池子大小。
+- 书生网关 CORS 全开（实测 `file://` 的 `Origin: null` 预检与 POST 均放行），所以单文件版可行；换自建网关若没开 CORS，就回退到 serve.mjs 玩法。
 
 ## 声明
 

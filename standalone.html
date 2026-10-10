@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模型辩论擂台 · 单文件版</title>
+<style>
+:root {
+  --paper: #f5efe3; --card: #fbf7ec; --ink: #262117; --soft: #8b8171; --faint: #b5ab97;
+  --line: #ddd3bd; --amber: #bc651f; --amber-wash: #f2ddc0;
+  --serif: "Noto Serif SC","Source Han Serif SC","Source Han Serif CN","Songti SC","STSong","SimSun",serif;
+  --mono: "Cascadia Mono","JetBrains Mono",Consolas,"Courier New",monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: radial-gradient(1200px 500px at 50% -120px, rgba(188,101,31,.07), transparent 60%), var(--paper); color: var(--ink); font-family: var(--serif); line-height: 1.75; min-height: 100vh; }
+body::after { content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); }
+main { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; position: relative; }
+.masthead { text-align:center; padding:40px 24px 18px; }
+.masthead h1 { font-size:clamp(30px,5.5vw,48px); letter-spacing:.35em; text-indent:.35em; font-weight:700; margin:8px 0 6px; }
+.mast-sub { color:var(--soft); font-size:14px; letter-spacing:.12em; }
+.mast-rule { color:var(--faint); font-size:12px; letter-spacing:.2em; }
+.masthead nav { margin-top:12px; font-size:15px; }
+.masthead nav a { color:var(--ink); text-decoration:none; padding:2px 6px; border-bottom:1px solid var(--line); cursor:pointer; }
+.masthead nav a:hover, .masthead nav a.on { color:var(--amber); border-color:var(--amber); }
+.nav-dot { color:var(--faint); margin:0 8px; }
+.sec-title { font-size:15px; letter-spacing:.4em; text-indent:.4em; color:var(--soft); text-align:center; margin-bottom:22px; }
+.sec-title::before,.sec-title::after { content:""; display:block; border-top:1px solid var(--line); margin:0 auto 8px; width:60%; }
+.sec-title::after { margin:8px auto 0; }
+.setup-card { background:var(--card); border:1px solid var(--line); box-shadow:0 24px 48px -32px rgba(38,33,23,.35); max-width:720px; margin:24px auto 30px; padding:36px 44px 26px; }
+.field { display:block; margin-bottom:16px; }
+.field > span { display:block; font-size:13px; letter-spacing:.25em; color:var(--soft); margin-bottom:6px; }
+.field .hint { color:var(--faint); letter-spacing:.1em; margin-left:8px; font-size:12px; }
+.field input, .field select { width:100%; font-family:var(--serif); font-size:17px; color:var(--ink); background:transparent; border:0; border-bottom:1.5px solid var(--line); padding:6px 2px; outline:none; border-radius:0; }
+#f-topic { font-size:23px; font-weight:700; }
+.field input:focus,.field select:focus { border-color:var(--amber); }
+.field input::placeholder { color:var(--faint); font-weight:400; }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.field-row.three { grid-template-columns:1fr 1fr 1fr; }
+select { appearance:none; -webkit-appearance:none; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%238b8171'/%3E%3C/svg%3E") no-repeat right 4px center; cursor:pointer; }
+.fold { border-top:1px dashed var(--line); margin-top:8px; padding-top:10px; }
+.fold summary { cursor:pointer; color:var(--soft); font-size:14px; letter-spacing:.15em; }
+.fold .mini { display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; margin-top:12px; }
+.fold .mini label { font-size:13px; color:var(--soft); display:flex; align-items:center; gap:8px; }
+.fold .mini select { font-size:13px; padding:2px 18px 2px 2px; }
+.ghost { background:transparent; border:1px solid var(--line); font-family:var(--serif); font-size:13.5px; color:var(--soft); padding:6px 14px; cursor:pointer; margin-top:10px; }
+.ghost:hover { border-color:var(--amber); color:var(--amber); }
+.switch-row { display:flex; gap:18px; align-items:center; margin:14px 0 4px; font-size:14px; color:var(--soft); flex-wrap:wrap; }
+.switch-row label { display:flex; gap:6px; align-items:center; cursor:pointer; }
+.cta { display:block; width:100%; margin-top:20px; font-family:var(--serif); font-size:20px; letter-spacing:.5em; text-indent:.5em; background:var(--ink); color:var(--card); border:0; padding:15px 0; cursor:pointer; transition:background .25s; }
+.cta:hover { background:var(--amber); }
+.cta:disabled { background:var(--faint); cursor:wait; }
+.form-error { color:#a33b2a; font-size:14px; margin-top:10px; text-align:center; }
+.setup-note { color:var(--soft); font-size:12.5px; text-align:center; margin-top:14px; }
+.archive { max-width:720px; margin:0 auto; }
+.archive-list { display:grid; gap:12px; }
+.arc-item { display:flex; align-items:baseline; gap:16px; background:var(--card); border:1px solid var(--line); padding:14px 20px; cursor:pointer; transition:border-color .2s,transform .2s; }
+.arc-item:hover { border-color:var(--amber); transform:translateX(4px); }
+.arc-date { font-family:var(--mono); font-size:12px; color:var(--soft); white-space:nowrap; }
+.arc-topic { flex:1; font-weight:700; }
+.arc-score { font-family:var(--mono); font-size:13px; color:var(--amber); white-space:nowrap; }
+.arc-badge { font-size:12px; color:var(--soft); border:1px solid var(--line); padding:1px 8px; white-space:nowrap; }
+.arc-badge.live { color:var(--amber); border-color:var(--amber); }
+.archive-empty { color:var(--soft); text-align:center; font-size:14px; }
+.arc-del { color:var(--faint); font-size:12px; cursor:pointer; margin-left:6px; }
+.arc-del:hover { color:#a33b2a; }
+.arena-head { text-align:center; padding:8px 0 4px; }
+.arena-topic { font-size:clamp(22px,4vw,34px); letter-spacing:.12em; margin-bottom:8px; }
+.arena-stances { font-size:15px; color:var(--soft); }
+.arena-stances b { color:var(--ink); }
+.arena-stances .sp { margin:0 14px; color:var(--faint); }
+.arena-progress { margin-top:12px; font-family:var(--mono); font-size:12px; color:var(--soft); }
+.stage-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:16px 0 24px; }
+.chip { font-size:12.5px; letter-spacing:.15em; color:var(--faint); border:1px solid var(--line); padding:3px 12px; transition:color .3s,border-color .3s,background .3s; }
+.chip.on { color:var(--amber); border-color:var(--amber); background:var(--amber-wash); }
+.chip.past { color:var(--soft); border-color:var(--soft); }
+.arena-bar { display:flex; justify-content:center; gap:12px; margin-bottom:22px; }
+.arena-grid { display:grid; grid-template-columns:236px 1fr; gap:28px; align-items:start; }
+.seatboard { position:sticky; top:16px; background:var(--card); border:1px solid var(--line); padding:18px 16px; }
+.seatboard h3 { font-size:13px; letter-spacing:.35em; color:var(--soft); text-align:center; margin-bottom:14px; }
+.seat { padding:7px 10px; margin-bottom:6px; border-left:3px solid transparent; transition:background .25s; }
+.seat .s-label { font-size:12px; color:var(--soft); letter-spacing:.2em; }
+.seat .s-alias { font-weight:700; font-size:16px; }
+.seat .s-model { font-family:var(--mono); font-size:10.5px; color:var(--faint); }
+.seat.pro { border-left-color:var(--amber); }
+.seat.con { border-left-color:var(--soft); border-left-style:dashed; }
+.seat.neutral { opacity:.85; }
+.seat.speaking { background:var(--amber-wash); animation:seatpulse 1.6s ease-in-out infinite; }
+@keyframes seatpulse { 50% { background:#edd0a4; } }
+.legend { text-align:center; font-size:11.5px; color:var(--soft); margin-top:10px; }
+.mark-pro,.mark-con { display:inline-block; width:10px; height:10px; vertical-align:-1px; }
+.mark-pro { background:var(--amber); } .mark-con { border:1.5px dashed var(--soft); }
+.feed { min-height:200px; }
+.stage-block { margin-bottom:34px; }
+.stage-name { font-size:14px; letter-spacing:.35em; text-align:center; margin-bottom:18px; }
+.stage-name::before,.stage-name::after { content:""; display:block; border-top:1px solid var(--line); width:42%; margin:0 auto; }
+.stage-name::before { margin-bottom:10px; } .stage-name::after { margin-top:10px; }
+.speech { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--soft); padding:16px 22px 12px; margin:0 0 14px auto; max-width:92%; animation:rise .5s ease both; }
+.speech.pro { border-left:3px solid var(--amber); }
+.speech.con { border-left:3px dashed var(--soft); margin-right:auto; margin-left:0; }
+.speech.neutral { max-width:100%; border-left:0; border-top:3px double var(--line); }
+@keyframes rise { from { opacity:0; transform:translateY(14px); } }
+.sp-head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+.sp-seat { font-weight:700; font-size:15px; letter-spacing:.1em; }
+.sp-alias { color:var(--amber); font-weight:700; }
+.sp-model { font-family:var(--mono); font-size:11px; color:var(--faint); }
+.sp-body { font-size:15.5px; text-align:justify; }
+.sp-meta { font-family:var(--mono); font-size:11px; color:var(--faint); text-align:right; margin-top:6px; }
+.pending { border:1px dashed var(--amber); background:rgba(242,221,192,.35); padding:14px 20px; margin-bottom:14px; max-width:92%; color:var(--amber); font-size:14.5px; }
+.pending .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--amber); margin-right:8px; animation:blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity:.15; } }
+.verdict { margin:40px auto 0; max-width:760px; background:var(--card); border:1px solid var(--line); border-top:3px double var(--ink); padding:32px 40px 28px; animation:rise .6s ease both; }
+.verdict h3 { text-align:center; font-size:15px; letter-spacing:.4em; color:var(--soft); margin-bottom:20px; }
+.win-line { text-align:center; margin-bottom:20px; }
+.win-side { font-size:32px; font-weight:700; letter-spacing:.2em; }
+.win-score { font-family:var(--mono); font-size:22px; color:var(--amber); margin-top:4px; }
+.win-best { font-size:14px; color:var(--soft); margin-top:8px; } .win-best b { color:var(--amber); }
+table.score-table { width:100%; border-collapse:collapse; font-size:14px; margin-bottom:12px; }
+.score-table th,.score-table td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:center; }
+.score-table th { color:var(--soft); font-weight:400; font-size:12.5px; }
+.score-table td:first-child { font-weight:700; text-align:left; }
+.score-table .total { color:var(--amber); font-weight:700; font-family:var(--mono); }
+.score-notes { font-size:13.5px; color:var(--soft); text-align:center; }
+.run-error { border:1px solid #a33b2a; color:#a33b2a; padding:16px 22px; text-align:center; margin-top:16px; }
+.done-flag { text-align:center; color:var(--soft); font-size:13px; letter-spacing:.3em; margin-top:26px; }
+.foot { text-align:center; color:var(--faint); font-size:11.5px; letter-spacing:.2em; padding:26px 0 40px; }
+.modal-mask { position:fixed; inset:0; background:rgba(38,33,23,.45); display:flex; align-items:center; justify-content:center; z-index:50; }
+.modal { background:var(--card); border:1px solid var(--ink); border-top:4px solid var(--amber); width:min(560px,92vw); padding:30px 34px 24px; }
+.modal h3 { letter-spacing:.3em; font-size:17px; margin-bottom:14px; }
+.modal p { font-size:13.5px; color:var(--soft); margin-bottom:14px; }
+.modal input { width:100%; font-family:var(--mono); font-size:13px; padding:8px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+.modal .row { display:flex; justify-content:space-between; align-items:center; margin-top:16px; gap:12px; }
+.modal label { font-size:13px; color:var(--soft); }
+.modal button { font-family:var(--serif); font-size:15px; letter-spacing:.2em; background:var(--ink); color:var(--card); border:0; padding:9px 26px; cursor:pointer; }
+.modal button:hover { background:var(--amber); }
+[hidden] { display:none !important; }
+@media (max-width:860px) {
+  .arena-grid { grid-template-columns:1fr; } .seatboard { position:static; }
+  #seat-cards { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+  .field-row,.field-row.three,.fold .mini { grid-template-columns:1fr; }
+  .setup-card { padding:26px 20px 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-rule">◆ ————— ◆ ————— ◆</div>
+  <h1>模型辩论擂台</h1>
+  <p class="mast-sub">单文件版 · 网关里的模型各领一个马甲，按国辩流程自己吵完</p>
+  <div class="mast-rule">◆ ————— ◆ ————— ◆</div>
+  <nav><a id="nav-home" class="on">设赛</a><span class="nav-dot">·</span><a id="nav-key">密钥设置</a></nav>
+</header>
+
+<main>
+
+<section id="view-setup">
+  <div class="setup-card">
+    <h2 class="sec-title">本场设置</h2>
+    <label class="field"><span>辩题</span>
+      <input id="f-topic" type="text" placeholder="例：技术让人变得更勤快还是更懒惰"></label>
+    <div class="field-row">
+      <label class="field"><span>正方立场<span class="hint">可不填</span></span>
+        <input id="f-pro" type="text" placeholder="例：技术让人更懒惰"></label>
+      <label class="field"><span>反方立场<span class="hint">可不填</span></span>
+        <input id="f-con" type="text" placeholder="例：技术让人更勤快"></label>
+    </div>
+    <div class="field-row three">
+      <label class="field"><span>自由辩论回合</span>
+        <select id="f-rounds"><option value="2">2 回合</option><option value="3" selected>3 回合</option><option value="4">4 回合</option></select></label>
+      <label class="field"><span>每组盘问轮数</span>
+        <select id="f-qa"><option value="1">1 轮</option><option value="2" selected>2 轮</option><option value="3">3 轮</option></select></label>
+      <label class="field"><span>席位分配</span>
+        <select id="f-assign"><option value="auto">按人设契合度</option><option value="shuffle">随机发牌</option><option value="manual">手动排席</option></select></label>
+    </div>
+    <details class="fold" id="fold-manual">
+      <summary>手动排席（每个席位指定一个模型）</summary>
+      <div class="mini" id="manual-slots"></div>
+      <button class="ghost" id="btn-auto-fill">按契合度自动填一遍</button>
+    </details>
+    <div class="switch-row">
+      <label><input type="checkbox" id="f-demo"> 演示模式（不请求 API，空跑全流程）</label>
+    </div>
+    <button class="cta" id="btn-start">开 赛</button>
+    <p class="form-error" id="setup-error" hidden></p>
+    <p class="setup-note">密钥只保存在你当前浏览器（localStorage），不写入文件、不上传任何地方。默认网关：书生 Discovery。一场完整辩论约 26 次调用。</p>
+  </div>
+  <div class="archive">
+    <h2 class="sec-title">历史对局（本机）</h2>
+    <div class="archive-list" id="archive-list"></div>
+  </div>
+</section>
+
+<section id="view-arena" hidden>
+  <div class="arena-head">
+    <h2 class="arena-topic" id="a-topic"></h2>
+    <div class="arena-stances" id="a-stances"></div>
+    <div class="arena-progress" id="a-progress"></div>
+    <div class="stage-chips" id="a-chips"></div>
+  </div>
+  <div class="arena-bar">
+    <button class="ghost" id="btn-stop">停止比赛</button>
+    <button class="ghost" id="btn-export-md">导出实录 Markdown</button>
+    <button class="ghost" id="btn-export-json">导出 debate.json</button>
+    <button class="ghost" id="btn-back">返回设赛</button>
+  </div>
+  <div class="arena-grid">
+    <aside class="seatboard">
+      <h3>席位板</h3><div id="seat-cards"></div>
+      <div class="legend"><span class="mark-pro"></span> 正方 &nbsp;<span class="mark-con"></span> 反方</div>
+    </aside>
+    <div class="feed" id="feed"></div>
+  </div>
+  <div class="verdict" id="verdict" hidden></div>
+</section>
+
+</main>
+
+<div class="modal-mask" id="modal-key" hidden>
+  <div class="modal">
+    <h3>网关密钥</h3>
+    <p>填入 OpenAI 兼容网关的 API key（默认对接书生 Discovery：<span style="font-family:var(--mono);font-size:12px">discovery-api.intern-ai.org.cn/v1</span>）。密钥仅保存在本浏览器。也可勾上首页「演示模式」免密钥空跑。</p>
+    <input id="key-input" type="password" placeholder="sk-..." autocomplete="off">
+    <div class="row">
+      <label><input type="checkbox" id="key-remember" checked> 记住（存 localStorage）</label>
+      <button id="key-save">保 存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ══════════ 模型池与人设（同 src/models.mjs）══════════ */
+const MODELS = [
+  { id:'deepseek-v4-pro-0813', alias:'锋刃', style:'逻辑链条又长又硬，喜欢当面拆对手的论证结构，攻击性强，不留情面。', traits:{constructive:4,rebuttal:5,questioning:5,closing:4,moderation:2,judging:5} },
+  { id:'kimi-k2.6', alias:'说书人', style:'长于铺陈叙事，用具体的人、具体的场景讲道理，感染力足，收尾漂亮。', traits:{constructive:4,rebuttal:3,questioning:3,closing:5,moderation:3,judging:4} },
+  { id:'minimax-m3', alias:'火种', style:'表达欲旺盛，金句多，节奏快，负责把全场气氛点燃，偶尔跳脱。', traits:{constructive:3,rebuttal:4,questioning:3,closing:5,moderation:3,judging:3} },
+  { id:'qwen3.8-27b', alias:'定盘星', style:'四平八稳，不抢话也不掉链子，擅长在混战里把己方立场重新摆正。', traits:{constructive:4,rebuttal:3,questioning:3,closing:3,moderation:4,judging:4} },
+  { id:'deepseek-v4-flash-0731', alias:'疾风', style:'反应极快，追问短促密集，盘问环节不给对手喘息的机会。', traits:{constructive:2,rebuttal:3,questioning:5,closing:2,moderation:3,judging:3} },
+  { id:'deepseek-v4-flash-vision', alias:'明察', style:'对细节过敏，专抓对手发言里前后不一致的措辞，以小见大。', traits:{constructive:2,rebuttal:4,questioning:4,closing:2,moderation:3,judging:3} },
+  { id:'Agents-A1', alias:'杂家', style:'知识面杂，什么领域都能接一句，野路子类比多，常在意外处得手。', traits:{constructive:3,rebuttal:4,questioning:3,closing:3,moderation:3,judging:3} },
+  { id:'Atria-Dawn-Preview', alias:'晨星', style:'温和克制，控场感好，念流程、cue 环节从不失手，天生的主持腔。', traits:{constructive:3,rebuttal:2,questioning:2,closing:3,moderation:5,judging:3} },
+];
+const SEATS = [
+  { key:'pro1', trait:'constructive', label:'正方一辩', side:'pro' },
+  { key:'pro2', trait:'rebuttal', label:'正方二辩', side:'pro' },
+  { key:'pro3', trait:'questioning', label:'正方三辩', side:'pro' },
+  { key:'pro4', trait:'closing', label:'正方四辩', side:'pro' },
+  { key:'con1', trait:'constructive', label:'反方一辩', side:'con' },
+  { key:'con2', trait:'rebuttal', label:'反方二辩', side:'con' },
+  { key:'con3', trait:'questioning', label:'反方三辩', side:'con' },
+  { key:'con4', trait:'closing', label:'反方四辩', side:'con' },
+  { key:'judge', trait:'judging', label:'裁判长', side:null },
+  { key:'chair', trait:'moderation', label:'主席', side:null },
+];
+const SIDE_NAME = { pro:'正方', con:'反方' };
+const findModel = (id) => MODELS.find(m=>m.id===id) || { id, alias:'无名', style:'风格未知，临场自定。', traits:{} };
+
+function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+
+function autoAssign(){
+  const pairs=[];
+  for(const s of SEATS) for(const m of MODELS) pairs.push({seat:s.key,model:m.id,score:m.traits[s.trait]??0});
+  pairs.sort((a,b)=>b.score-a.score||SEATS.findIndex(s=>s.key===a.seat)-SEATS.findIndex(s=>s.key===b.seat));
+  const hats={}, assign={};
+  for(const p of pairs){ if(assign[p.seat]||hats[p.model])continue; assign[p.seat]=p.model; hats[p.model]=1; if(Object.keys(assign).length===SEATS.length)break; }
+  const cap=Math.ceil(SEATS.length/MODELS.length);
+  for(const p of pairs) if(!assign[p.seat]&&(hats[p.model]||0)<cap){ assign[p.seat]=p.model; hats[p.model]=(hats[p.model]||0)+1; }
+  for(const p of pairs) if(!assign[p.seat]) assign[p.seat]=p.model;
+  return assign;
+}
+function shuffleAssign(seed){
+  const rng=mulberry32(seed), pool=MODELS.map(m=>m.id);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const assign={}; SEATS.forEach((s,i)=>{assign[s.key]=pool[i%pool.length];}); return assign;
+}
+
+/* ══════════ 网关客户端 ══════════ */
+const BASE = 'https://discovery-api.intern-ai.org.cn/v1';
+let memKey = '';               // 会话内存里的 key
+function getSavedKey(){ try{ return localStorage.getItem('da_key')||''; }catch{ return memKey; } }
+function setSavedKey(k, remember){ memKey=k; if(remember){ try{ localStorage.setItem('da_key',k); }catch{} } }
+
+async function chat({ model, messages, temperature=0.8, maxTokens=8192, thinking=false, json=false, timeoutMs=600000 }){
+  const body={ model, messages, temperature, max_tokens:maxTokens };
+  if(!thinking){ body.thinking={type:'disabled'}; body.reasoning_effort='low'; }
+  if(json) body.response_format={type:'json_object'};
+  const t0=Date.now();
+  const ac=new AbortController(); const timer=setTimeout(()=>ac.abort(),timeoutMs);
+  let res;
+  try{
+    res=await fetch(`${BASE}/chat/completions`,{ method:'POST',
+      headers:{'content-type':'application/json',authorization:`Bearer ${getSavedKey()}`},
+      body:JSON.stringify(body), signal:ac.signal });
+  } finally { clearTimeout(timer); }
+  if(!res.ok) throw new Error(`网关 ${res.status}: ${(await res.text().catch(()=>'')).slice(0,200)}`);
+  const data=await res.json();
+  const ch=data.choices?.[0]; if(!ch) throw new Error('响应缺少 choices');
+  const reasoning=ch.message.reasoning_content||'';
+  let content=ch.message.content||''; let recovered=false;
+  if(!content.trim()&&reasoning.trim()){ content=reasoning; recovered=true; }
+  return { model, text:content.trim(), truncated:ch.finish_reason==='length', recoveredFromReasoning:recovered, elapsedMs:Date.now()-t0, usage:data.usage||{} };
+}
+
+/* 演示模式：不调 API，按环节返回占位内容 */
+let mockNo=0;
+async function mockChat({model,messages,json}){
+  await new Promise(r=>setTimeout(r,260));
+  mockNo++;
+  if(json){
+    const seed=mockNo%2?1:0;   // 交替让"正/反"先手局都有样本
+    const pt=86-seed*4, ct=80+seed*5;
+    return { model, text: JSON.stringify({ pro_total:pt, con_total:ct, winner: pt>ct?'pro':'con', best_debater_seat: pt>ct?'pro4':'con4',
+      score_breakdown:{ pro:{内容与逻辑:Math.round(pt*.4),语言表达:Math.round(pt*.3),团队配合与应变:pt-Math.round(pt*.4)-Math.round(pt*.3)},
+                        con:{内容与逻辑:Math.round(ct*.4),语言表达:Math.round(ct*.3),团队配合与应变:ct-Math.round(ct*.4)-Math.round(ct*.3)} },
+      notes:'演示模式：占位评分，未调用任何模型' }), truncated:false, recoveredFromReasoning:false, elapsedMs:260, usage:{completion_tokens:0} };
+  }
+  return { model, text:`（演示占位发言 · ${model}）本环节内容在实际运行时由该模型生成。演示模式不调用网关，用于查看流程、席位分配与界面布局。`, truncated:false, recoveredFromReasoning:false, elapsedMs:260, usage:{completion_tokens:0} };
+}
+
+/* ══════════ 编排（同 src/orchestrator.mjs，含掷币制）══════════ */
+let abortFlag=false;
+
+async function runDebate({ topic, proStance, conStance, assign, freeRounds=3, qaRounds=2, demo=false, onEvent=()=>{} }){
+  const call = demo? mockChat : chat;
+  const stance={pro:proStance,con:conStance};
+  const firstTeam = Math.random()<0.5 ? 'pro':'con';
+  const secondTeam = firstTeam==='pro'?'con':'pro';
+  onEvent({type:'coin', firstTeam});
+  const transcript=[]; let callNo=0;
+  const totalCalls = 1+2+2*(2*qaRounds+1)+2+2*freeRounds+2+3;
+  const context=()=>transcript.map(s=>`【${s.label}·${s.alias}】${s.text.length>900?s.text.slice(0,900)+'……（发言略）':s.text}`).join('\n\n')||'（场上还没有发言。）';
+
+  async function speak(seatKey, task, opts={}){
+    if(abortFlag) throw new Error('已手动停止');
+    const modelId=assign[seatKey], seat=SEATS.find(s=>s.key===seatKey), m=findModel(modelId);
+    const sideName=seat.side?SIDE_NAME[seat.side]:m.alias;
+    const system = opts.system ?? [
+      `你是一场中文辩论赛里的「${m.alias}」，真实身份是语言模型 ${m.id}。`,
+      `本场辩题：${topic}。${sideName}的立场：${stance[seat.side]??'（非选手席位）'}。`,
+      `你的席位：${seat.label}。你的人设：${m.style}`,
+      `赛制为国际大专辩论赛流程：开篇立论 → 盘问 → 驳立论 → 自由辩论 → 结辩。`,
+      `要求：全程中文；只输出你的发言本身，不要解释规则、不要旁白、不要自问自答；紧扣场上已发生的发言。`,
+    ].join('\n');
+    const messages=[{role:'system',content:system},{role:'user',content:`【场上实录】\n${context()}\n\n【现在轮到你】${task}`}];
+    callNo++;
+    onEvent({type:'pending', idx:callNo, total:totalCalls, stage:opts.stage||seat.label, seat:seatKey, label:seat.label, alias:m.alias, model:modelId, startedAt:Date.now()});
+    let r;
+    try { r=await call({model:modelId,messages,...opts.chatOpts}); }
+    catch(e1){ onEvent({type:'retry', msg:`${seat.label} 调用失败（${e1.message.slice(0,60)}），重试…`}); await new Promise(ok=>setTimeout(ok,2000)); r=await call({model:modelId,messages,...opts.chatOpts}); }
+    const entry={ stage:opts.stage||seat.label, seat:seatKey, side:seat.side, label:seat.label, alias:m.alias, model:modelId,
+      text:r.text||'（该模型未产出正文）', truncated:r.truncated, recovered:r.recoveredFromReasoning, elapsedMs:r.elapsedMs, usage:r.usage };
+    transcript.push(entry);
+    onEvent({type:'speech', entry});
+    return entry;
+  }
+
+  await speak('chair',[
+    '你是本场辩论赛主席。做开场：宣布辩题、介绍正方与反方立场、点名四方辩手席位与裁判长，',
+    '并简要说明流程（立论→盘问→驳立论→自由辩论→结辩→裁判评议）。',
+    `赛前掷硬币结果：${SIDE_NAME[firstTeam]}获得先手（开篇立论第一个发言），并由${SIDE_NAME[firstTeam]}四辩压轴结辩。请在开场词中宣布这一掷币结果。`,
+    '250 字以内，只说开场词。'].join(''),{stage:'主席开场',chatOpts:{temperature:0.7}});
+
+  for(const k of [`${firstTeam}1`,`${secondTeam}1`])
+    await speak(k,'开篇立论：给出你方对辩题核心概念的定义与比较标准，再用三个分论点搭起你方立论框架。700 字以内。',{stage:'开篇立论'});
+
+  for(const [askKey,ansKey] of [[`${firstTeam}3`,`${secondTeam}1`],[`${secondTeam}3`,`${firstTeam}1`]]){
+    const asker=SEATS.find(s=>s.key===askKey).label, answerer=SEATS.find(s=>s.key===ansKey).label;
+    for(let i=1;i<=qaRounds;i++){
+      await speak(askKey,`盘问环节第 ${i} 问：向${answerer}提出一个追问，一次只问一个问题，80 字以内，不要自己作答。`);
+      await speak(ansKey,`回答${asker}刚才的提问：直面问题本身，不回避，给出你方解释。150 字以内。`);
+    }
+    await speak(askKey,'盘问小结：用一段话点明刚才盘问中你方获得的最有价值的东西（对方暴露的前提、退让或矛盾）。200 字以内。');
+  }
+
+  for(const k of [`${firstTeam}2`,`${secondTeam}2`])
+    await speak(k,'驳立论：针对对方此前的立论与盘问表现做系统反驳，指出其定义或推论上的漏洞，同时重申你方框架。600 字以内。',{stage:'驳立论'});
+
+  for(let r=1;r<=freeRounds;r++)
+    for(const side of [firstTeam,secondTeam])
+      await speak(`${side}${['2','3','4'][(r-1)%3]}`,'自由辩论：轮到你方发言，回应对方最近一次发言或抛出新的攻击点。150 字以内，短、准、狠。',{stage:`自由辩论 第${r}轮`});
+
+  for(const k of [`${secondTeam}4`,`${firstTeam}4`])
+    await speak(k,'结辩陈词：收束全场，比较双方整场交锋的得失，把裁判的注意力引向你方最硬的论点。700 字以内。',{stage:'结辩'});
+
+  const judgeModel=findModel(assign.judge);
+  const fullContext=transcript.map(s=>`【${s.label}·${s.alias}】${s.text.slice(0,1200)}`).join('\n\n');
+  const scoreSystem=[
+    `你是辩论赛的裁判长，代号「${judgeModel.alias}」，真实身份是语言模型 ${assign.judge}。`,
+    `你评审的辩题是「${topic}」。${SIDE_NAME[firstTeam]}立场：${stance[firstTeam]}；${SIDE_NAME[secondTeam]}立场：${stance[secondTeam]}。`,
+    '按国际大专辩论赛标准评分：内容与逻辑 40 分、语言表达 30 分、团队配合与应变 30 分，三项合计 100。',
+    `注意：本场由掷硬币决定出场顺序（${SIDE_NAME[firstTeam]}先手并压轴结辩），评分只看论证质量本身，不得因出场顺序、发言先后或"先定义框架"的优势偏挞任何一方。`,
+    '只输出 JSON，不要输出其他文字。JSON 形如：',
+    '{"pro_total":0,"con_total":0,"winner":"pro|con|tie","best_debater_seat":"pro3","score_breakdown":{"pro":{"内容与逻辑":0,"语言表达":0,"团队配合与应变":0},"con":{"内容与逻辑":0,"语言表达":0,"团队配合与应变":0}},"notes":"一句话核心理由"}',
+  ].join('\n');
+  callNo++;
+  onEvent({type:'pending', idx:callNo, total:totalCalls, stage:'裁判评分', seat:'judge', label:'裁判长', alias:judgeModel.alias, model:assign.judge, startedAt:Date.now()});
+  let scores;
+  for(let attempt=1;;attempt++){
+    const r=await call({model:assign.judge,temperature:0.2,maxTokens:4096,json:true,messages:[{role:'system',content:scoreSystem},{role:'user',content:`【全场实录】\n${fullContext}\n\n请给出评分 JSON。`}]});
+    onEvent({type:'speech', entry:{stage:'裁判评分',seat:'judge',side:null,label:'裁判长',alias:judgeModel.alias,model:assign.judge,text:'（评分已提交，见评分卡）',truncated:false,recovered:false,elapsedMs:r.elapsedMs,usage:r.usage}});
+    try{ scores=JSON.parse(r.text.match(/\{[\s\S]*\}/)?.[0]||'null'); break; }
+    catch{ if(attempt>=2) throw new Error('裁判评分 JSON 解析失败'); }
+  }
+  const winner = scores.winner&&scores.winner!=='tie' ? scores.winner : (scores.pro_total>scores.con_total?'pro':scores.con_total>scores.pro_total?'con':firstTeam);
+  onEvent({type:'score', scores, winner, winnerLabel:SIDE_NAME[winner], firstTeam});
+
+  const critique=await speak('judge',[
+    '裁判点评（口头部分）：结合你的评分，指出本场胜负手在哪里、双方最值得肯定的表现各一处，',
+    `并说明为什么最佳辩手是 ${SEATS.find(s=>s.key===scores.best_debater_seat)?.label??'该选手'}。300 字以内。`].join(''),
+    {stage:'裁判点评',chatOpts:{temperature:0.6}});
+
+  const bestSeat=SEATS.find(s=>s.key===scores.best_debater_seat);
+  const result=await speak('chair',[
+    `宣布结果：正方 ${scores.pro_total} 比 反方 ${scores.con_total}，胜方为${SIDE_NAME[winner]}，最佳辩手为${bestSeat?.label??'?'}（${bestSeat?findModel(assign[bestSeat.key]).alias:'?'}）。`,
+    '念出终场宣布词：宣布比分、胜方与最佳辩手，感谢双方与裁判。100 字以内。'].join(''),
+    {stage:'主席宣布',chatOpts:{temperature:0.7}});
+
+  return { topic, proStance, conStance, assign, firstTeam, transcript, scores, winnerLabel:SIDE_NAME[winner], winner, demo, savedAt:Date.now() };
+}
+
+/* ══════════ Markdown 导出 ══════════ */
+function toMarkdown(r){
+  const L=[];
+  L.push(`# 辩论赛实录：${r.topic}`,'',
+    `- 正方立场：${r.proStance}`,`- 反方立场：${r.conStance}`,
+    r.firstTeam?`- 掷硬币：${SIDE_NAME[r.firstTeam]}先手（开篇立论在先），并由其四辩压轴结辩`:'',
+    `- 时间：${new Date(r.savedAt||Date.now()).toLocaleString('zh-CN')}`, r.demo?'- 模式：演示（未调用真实模型）':'', '','## 席位分配',
+    '| 席位 | 马甲 | 模型 |','|---|---|---|',
+    ...SEATS.map(s=>{const m=findModel(r.assign[s.key]);return `| ${s.label} | ${m.alias} | \`${m.id}\` |`;}),'');
+  let last=null;
+  for(const s of r.transcript){
+    if(s.stage!==last){L.push(`## ${s.stage}`,'');last=s.stage;}
+    L.push('**'+s.label+'（'+s.alias+' · `'+s.model+'`）**','',s.text,'',
+      `> ${(s.elapsedMs/1000).toFixed(1)}s${s.usage?.completion_tokens!=null?` ｜ ${s.usage.completion_tokens} tok`:''}${s.truncated?' ｜ 被截断':''}`,'');
+  }
+  if(r.scores){
+    const bd=r.scores.score_breakdown||{};
+    L.push('## 裁判评分','',
+      '| 方 | 内容与逻辑(40) | 语言表达(30) | 配合与应变(30) | 总分 |','|---|---|---|---|---|',
+      ...['pro','con'].map(side=>{const b=bd[side]||{};return `| ${SIDE_NAME[side]} | ${b['内容与逻辑']??'-'} | ${b['语言表达']??'-'} | ${b['团队配合与应变']??'-'} | **${side==='pro'?r.scores.pro_total:r.scores.con_total}** |`;}),'',
+      `- 胜方：**${r.winnerLabel}**`,
+      `- 最佳辩手：${(()=>{const b=SEATS.find(s=>s.key===r.scores.best_debater_seat);return b?`${b.label}（${findModel(r.assign[b.key]).alias} · \`${r.assign[b.key]}\`）`:'-';})()}`,
+      r.scores.notes?`- 裁判核心考量：${r.scores.notes}`:'','');
+  }
+  return L.join('\n');
+}
+
+/* ══════════ 历史存储 ══════════ */
+function loadRuns(){ try{ return JSON.parse(localStorage.getItem('da_runs')||'[]'); }catch{ return []; } }
+function saveRun(r){
+  const runs=loadRuns(); runs.unshift(r);
+  while(runs.length>12) runs.pop();
+  try{ localStorage.setItem('da_runs',JSON.stringify(runs)); }catch{ /* 空间不足就只留内存 */ }
+}
+
+/* ══════════ 界面 ══════════ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const br=s=>esc(s).replace(/\n/g,'<br>');
+const SEAT_CHIP=['主席开场','开篇立论','盘问','驳立论','自由辩论','结辩','裁判','主席宣布'];
+function chipOf(st){ if(!st)return null; if(st.includes('盘问'))return '盘问'; if(st.includes('裁判'))return '裁判'; if(st==='主席开场')return '主席开场'; if(st==='主席宣布')return '主席宣布'; for(const c of SEAT_CHIP) if(c!=='盘问'&&c!=='裁判'&&st.includes(c))return c; return null; }
+
+let current=null, tickTimer=null;
+
+function showArena(){ $('#view-setup').hidden=true; $('#view-arena').hidden=false; }
+function showSetup(){ $('#view-arena').hidden=true; $('#view-setup').hidden=false; renderArchive(); stopTick(); }
+$('#nav-home').onclick=showSetup;
+$('#nav-key').onclick=()=>{ $('#key-input').value=getSavedKey(); $('#modal-key').hidden=false; };
+$('#key-save').onclick=()=>{ setSavedKey($('#key-input').value.trim(), $('#key-remember').checked); $('#modal-key').hidden=true; };
+$('#modal-key').onclick=e=>{ if(e.target.id==='modal-key') $('#modal-key').hidden=true; };
+
+/* 手动排席面板 */
+const slotsBox=$('#manual-slots');
+slotsBox.innerHTML=SEATS.map(s=>`<label>${s.label}<select data-slot="${s.key}">${MODELS.map(m=>`<option value="${m.id}">${m.alias} · ${m.id}</option>`).join('')}</select></label>`).join('');
+$('#f-assign').onchange=()=>{ $('#fold-manual').open = $('#f-assign').value==='manual'; };
+$('#btn-auto-fill').onclick=()=>{ const a=autoAssign(); slotsBox.querySelectorAll('select').forEach(el=>el.value=a[el.dataset.slot]); };
+
+function renderArchive(){
+  const box=$('#archive-list'), runs=loadRuns();
+  if(!runs.length){ box.innerHTML='<p class="archive-empty">本机还没有对局。上面出一道辩题，开赛。</p>'; return; }
+  box.innerHTML=runs.map((r,i)=>{
+    const s=r.scores, score=s?`${s.pro_total} : ${s.con_total}`:'';
+    const d=new Date(r.savedAt); const ds=`${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    return `<div class="arc-item" data-i="${i}"><span class="arc-date">${ds}${r.demo?' 演示':''}</span><span class="arc-topic">${esc(r.topic)}</span><span class="arc-score">${score}</span><span class="arc-badge">${r.error?'中断':'已完赛'}</span><span class="arc-del" data-del="${i}">删</span></div>`;
+  }).join('');
+  box.querySelectorAll('.arc-item').forEach(el=>el.onclick=e=>{ if(e.target.dataset.del!==undefined)return; replay(loadRuns()[+el.dataset.i]); });
+  box.querySelectorAll('.arc-del').forEach(el=>el.onclick=e=>{ e.stopPropagation(); const runs2=loadRuns(); runs2.splice(+el.dataset.del,1); try{localStorage.setItem('da_runs',JSON.stringify(runs2));}catch{} renderArchive(); });
+}
+
+function renderSeats(st){
+  $('#seat-cards').innerHTML=SEATS.map(s=>{
+    const m=findModel(st.assign[s.key]);
+    const cls=s.side||'neutral';
+    const speaking=st.pending&&st.pending.seat===s.key?' speaking':'';
+    return `<div class="seat ${cls}${speaking}"><div class="s-label">${s.label}</div><div class="s-alias">${m.alias}</div><div class="s-model">${m.id}</div></div>`;
+  }).join('');
+}
+function renderChips(st){
+  const cur=chipOf(st.pending?.stage||st.transcript[st.transcript.length-1]?.stage);
+  const curIdx=cur?SEAT_CHIP.indexOf(cur):-1;
+  $('#a-chips').innerHTML=SEAT_CHIP.map((c,i)=>`<span class="chip ${i===curIdx?'on':i<curIdx?'past':''}">${c}</span>`).join('');
+}
+function renderVerdict(st){
+  const box=$('#verdict');
+  if(!st.scores){box.hidden=true;return;}
+  box.hidden=false;
+  const s=st.scores, bd=s.score_breakdown||{};
+  const best=SEATS.find(x=>x.key===s.best_debater_seat);
+  const bestM=best?findModel(st.assign[best.key]):null;
+  box.innerHTML=`<h3>裁判评分卡</h3>
+    <div class="win-line">
+      ${st.winnerLabel?`<div class="win-side">${st.winnerLabel}占上风</div>`:''}
+      <div class="win-score">正方 ${s.pro_total} ：${s.con_total} 反方</div>
+      ${best?`<div class="win-best">最佳辩手 <b>${best.label} · ${bestM.alias}</b></div>`:''}
+      ${st.firstTeam?`<div class="win-best">掷币先手/压轴 <b>${SIDE_NAME[st.firstTeam]}</b></div>`:''}
+    </div>
+    <table class="score-table">
+      <tr><th>方</th><th>内容与逻辑 40</th><th>语言表达 30</th><th>配合与应变 30</th><th>总分</th></tr>
+      ${['pro','con'].map(side=>{const b=bd[side]||{};return `<tr><td>${SIDE_NAME[side]}</td><td>${b['内容与逻辑']??'—'}</td><td>${b['语言表达']??'—'}</td><td>${b['团队配合与应变']??'—'}</td><td class="total">${side==='pro'?s.pro_total:s.con_total}</td></tr>`;}).join('')}
+    </table>
+    ${s.notes?`<p class="score-notes">${esc(s.notes)}</p>`:''}`;
+}
+function renderHead(st){
+  $('#a-topic').textContent=`「${st.topic}」`;
+  $('#a-stances').innerHTML=`<b>正方</b> ${esc(st.proStance)}<span class="sp">◆</span><b>反方</b> ${esc(st.conStance)}`;
+  const n=st.transcript.length;
+  $('#a-progress').textContent = st.status==='running'
+    ? `进行中 ｜ 已发言 ${n} ｜ 第 ${st.pending?.idx??'?'}/${st.pending?.total??'?'} 手${st.demo?' ｜ 演示模式':''}`
+    : st.status==='done' ? `已完赛 ｜ ${n} 次发言${st.demo?' ｜ 演示模式':''}`
+    : `比赛第 ${n+1} 手中断`;
+}
+function renderFeed(st){
+  const feed=$('#feed');
+  feed.innerHTML='';
+  let cur=null;
+  for(const e of st.transcript){
+    if(!cur||cur.stage!==e.stage){ cur=document.createElement('div'); cur.className='stage-block'; cur.innerHTML=`<div class="stage-name">${esc(e.stage)}</div>`; feed.appendChild(cur); }
+    const card=document.createElement('article');
+    card.className=`speech ${e.side||'neutral'}`;
+    const meta=[`${(e.elapsedMs/1000).toFixed(1)}s`, e.usage?.completion_tokens!=null?`${e.usage.completion_tokens} tok`:'', e.truncated?'被截断':''].filter(Boolean).join(' ｜ ');
+    card.innerHTML=`<div class="sp-head"><span class="sp-seat">${esc(e.label)}</span><span class="sp-alias">${esc(e.alias)}</span><span class="sp-model">${esc(e.model)}</span></div><div class="sp-body">${br(e.text)}</div><div class="sp-meta">${meta}</div>`;
+    cur.appendChild(card);
+  }
+  const pdOld=feed.querySelector('.pending'); if(pdOld)pdOld.remove();
+  if(st.pending){
+    const pd=document.createElement('div'); pd.className='pending';
+    pd.innerHTML=`<span class="dot"></span>${esc(st.pending.alias)} · ${esc(st.pending.label)} 正在「${esc(st.pending.stage)}」… <span class="wait-s"></span>`;
+    feed.appendChild(pd); startTick(st);
+  } else stopTick();
+  if(st.status==='done'){ const df=document.createElement('div'); df.className='done-flag'; df.textContent='—— 本 场 终 ——'; feed.appendChild(df); }
+  if(st.status==='error'){ const er=document.createElement('div'); er.className='run-error'; er.textContent=`比赛中断：${st.error}`; feed.appendChild(er); }
+  const nearBottom=window.innerHeight+window.scrollY>document.body.offsetHeight-400;
+  if(nearBottom) window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+function startTick(st){
+  stopTick();
+  tickTimer=setInterval(()=>{
+    const el=document.querySelector('.pending .wait-s');
+    if(el&&st.pending?.startedAt) el.textContent=`已等 ${Math.floor((Date.now()-st.pending.startedAt)/1000)} 秒`;
+  },1000);
+}
+function stopTick(){ if(tickTimer){clearInterval(tickTimer);tickTimer=null;} }
+
+function paint(st){ current=st; renderHead(st); renderSeats(st); renderChips(st); renderFeed(st); renderVerdict(st); }
+
+/* 开赛 */
+$('#btn-start').onclick=async ()=>{
+  const topic=$('#f-topic').value.trim(), err=$('#setup-error'); err.hidden=true;
+  if(!topic){ err.hidden=false; err.textContent='先写辩题。'; return; }
+  const demo=$('#f-demo').checked;
+  if(!demo && !getSavedKey()){ $('#key-input').value=''; $('#modal-key').hidden=false; err.hidden=false; err.textContent='保存密钥后再点开赛（或勾演示模式）。'; return; }
+  const mode=$('#f-assign').value;
+  let assign;
+  if(mode==='manual'){ assign={}; slotsBox.querySelectorAll('select').forEach(el=>assign[el.dataset.slot]=el.value); }
+  else if(mode==='shuffle') assign=shuffleAssign(Date.now());
+  else assign=autoAssign();
+  const proStance=$('#f-pro').value.trim()||`支持辩题所表述的一方（即「${topic}」成立）`;
+  const conStance=$('#f-con').value.trim()||`反对辩题所表述的一方（即「${topic}」不成立）`;
+  const st={ topic, proStance, conStance, assign, demo, status:'running', transcript:[], pending:null, scores:null, winner:null, winnerLabel:null, firstTeam:null, error:null };
+  abortFlag=false;
+  showArena(); paint(st);
+  const btn=$('#btn-start'); btn.disabled=true; btn.textContent='比赛中…';
+  try{
+    const result=await runDebate({ topic, proStance, conStance, assign,
+      freeRounds:Number($('#f-rounds').value), qaRounds:Number($('#f-qa').value), demo,
+      onEvent:(ev)=>{
+        if(ev.type==='coin'){ st.firstTeam=ev.firstTeam; }
+        else if(ev.type==='pending'){ st.pending=ev; }
+        else if(ev.type==='speech'){ st.transcript.push(ev.entry); st.pending=null; }
+        else if(ev.type==='score'){ st.scores=ev.scores; st.winner=ev.winner; st.winnerLabel=ev.winnerLabel; st.firstTeam=ev.firstTeam; st.pending=null; }
+        paint(st);
+      },
+    });
+    Object.assign(st,result,{status:'done'}); st.pending=null;
+  }catch(e){
+    st.status='error'; st.pending=null; st.error=String(e.message||e);
+  }
+  st.savedAt=Date.now();
+  saveRun(st);
+  paint(st);
+  btn.disabled=false; btn.textContent='开 赛';
+};
+$('#btn-stop').onclick=()=>{ abortFlag=true; };
+$('#btn-back').onclick=showSetup;
+$('#btn-export-md').onclick=()=>{ if(!current)return; download(`辩论实录-${current.topic.slice(0,12)}.md`, toMarkdown(current)); };
+$('#btn-export-json').onclick=()=>{ if(!current)return; download('debate.json', JSON.stringify(current)); };
+function download(name,text){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+function replay(r){ showArena(); paint({...r, status:r.error?'error':'done', pending:null}); }
+
+renderArchive();
+</script>
+</body>
+</html>
